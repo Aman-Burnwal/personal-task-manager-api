@@ -1,0 +1,27 @@
+{
+  "name": "personal-task-manager-api",
+  "version": "1.0.0",
+  "description": "Personal Task Manager API that allows users to manage their daily tasks with basic features like task creation, updates, deletion, and filtering based on priority, due dates, or completion status",
+  "main": "nodemon server.js",
+  "type": "module",
+  "scripts": {
+    "test": "node server.js",
+    "dev" : "nodemon server.js"
+  },
+  "keywords": [
+    "express",
+    "node",
+    "mysql",
+    "jwt",
+    "crypto"
+  ],
+  "author": "Banti",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.3",
+    "nodemon": "^3.1.10"
+  }
+}
