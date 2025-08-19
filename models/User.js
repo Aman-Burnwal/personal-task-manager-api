@@ -3,7 +3,7 @@ import sequelize from './index.js';
 import { USER } from '../utils/constant.js';
 
 const User = sequelize.define('User', {
-  id: {
+  [USER.ID]: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true,
