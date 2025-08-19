@@ -157,3 +157,25 @@ export const updateTask = async (req, res) => {
     });
   }
 };
+
+export const deleteTask = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await Task.destroy({
+      where: {
+        [TASK.ID] : id
+      }
+    })
+    return res.status(200).json({
+      success: true,
+      message: 'Task deleted successful'
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server Error in task deletion',
+      error: error.message
+    })
+  }
+}
