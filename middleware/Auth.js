@@ -17,7 +17,7 @@ export const isUserAuthorized = async (req, res, next) => {
     if (!task) {
       return res.status(400).json({
         success: false,
-        message: `There is no class that belongs to this id: %{id}`,
+        message: `There is no task that belongs to id: ` + id,
       });
     }
 
