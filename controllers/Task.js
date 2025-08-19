@@ -81,3 +81,24 @@ export const getAllTasks = async (req, res) => {
     })
   }
 }
+
+export const fetchSingleTask = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const task = await Task.findByPk(id);
+    return res.status(200).json({
+      success: true,
+      message: "Task found successful",
+      task
+    })
+    
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    })
+  }
+
+}
