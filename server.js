@@ -1,13 +1,17 @@
 import express, { json } from 'express';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import connectDB from './config/connectDB.js';
 import userRouter from './routers/User.js'
+import taskRouter from './routers/Task.js'
 
 dotenv.config();
 const app = express();
 
 app.use(json());
-app.use("/api/v1", userRouter)
+app.use(cookieParser());
+app.use("/api/v1/auth", userRouter);
+app.use('/api/v1/task', taskRouter);
 const PORT = process.env.PORT || 3000;
 
 
