@@ -1,59 +1,37 @@
 import jwt from 'jsonwebtoken';
 import Task from '../models/Task.js';
 import { TASK } from '../utils/constant.js';
+import { errorHandler } from '../utils/errorHandler.js';
 
 export const isUserAuthorized = async (req, res, next) => {
   const { id } = req.params;
   const { id: userId } = req.user;
 
-  if (!id) {
-    return res.status(400).json({
-      success: false,
-      message: 'Task id is missing',
-    });
-  }
+  if (!id) return next(errorHandler(400, 'Task id is missing'));
+
   try {
     const task = await Task.findByPk(id);
-    if (!task) {
-      return res.status(400).json({
-        success: false,
-        message: `There is no task that belongs to id: ` + id,
-      });
-    }
+    if (!task) return next(errorHandler(404, `No task found with id: ${id}`));
 
     if (task[TASK.USER_ID] != userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'Task doesn\'t belongs to the user'
-      })
+      return next(errorHandler(403, "Task doesn't belong to this user"));
     }
+
     next();
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-    });
+    next(error);
   }
- 
 };
 
 export const isValidUser = async (req, res, next) => {
   const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: 'User is not login',
-    });
-  }
+  if (!token) return next(errorHandler(401, 'User is not logged in'));
 
   try {
     const decode = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decode;
     next();
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'User is not authentic.',
-    });
+    return next(errorHandler(401, 'User is not authentic'));
   }
 };
