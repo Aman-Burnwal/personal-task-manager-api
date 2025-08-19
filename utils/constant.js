@@ -2,7 +2,19 @@
 export const USER = {
   USERNAME: "username",
   PASSWORD: "password",
-  EMAIL: "email"
+  EMAIL: "email",
+  ID: 'id'
+}
+
+export const TASK = {
+  ID: 'id',
+  TITLE: 'title',
+  DESCRIPTION: 'description',
+  PRIORITY: 'priority',
+  DUE_DATE: 'dueDate',
+  USER_ID: 'userId',
+  STATUS: 'status'
+
 }
 
 export const VALIDATIONS = {
