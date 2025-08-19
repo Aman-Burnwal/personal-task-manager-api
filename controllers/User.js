@@ -1,8 +1,9 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { Op } from 'sequelize';
-import User from '../models/User.js';
 import { USER, VALIDATIONS } from '../utils/constant.js';
+import {
+  findUserByEmailOrUsername,
+  loginUser,
+  registerUser,
+} from '../services/auth.js';
 
 export const signup = async (req, res) => {
   if (!req.body) {
@@ -68,11 +69,7 @@ export const signup = async (req, res) => {
     });
   }
 
-  const isUserAlreadyExist = await User.findOne({
-    where: {
-      [Op.or]: [{ [USER.EMAIL]: email }, { [USER.USERNAME]: username }],
-    },
-  });
+  const isUserAlreadyExist = await findUserByEmailOrUsername(email, username);
 
   if (isUserAlreadyExist) {
     return res.status(400).json({
@@ -85,16 +82,10 @@ export const signup = async (req, res) => {
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const userObj = {
-      [USER.USERNAME]: username,
-      [USER.EMAIL]: email,
-      [USER.PASSWORD]: hashedPassword,
-    };
-    await User.create(userObj);
+    await registerUser(username, email, password);
     return res.status(201).json({
       success: true,
-      message: 'User registration successful',
+      message: 'User registered successful',
     });
   } catch (error) {
     return res.status(500).json({
@@ -141,45 +132,29 @@ export const login = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({
-      where: { [USER.EMAIL]: email },
+    const loginData = await loginUser(email, password);
+    if (!loginData) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email or password',
+      });
+    }
+
+    const { user, token } = loginData;
+    user.password = undefined;
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 24 * 60 * 60 * 1000,
     });
-    if (!user) {
-      return res.status(200).json({
-        success: false,
-        message: 'You are not registered',
-      });
-    }
 
-    if (await bcrypt.compare(password, user.password)) {
-      const payload = {
-        id: user[USER.ID],
-      };
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '24h',
-      });
-
-      user.password = undefined;
-
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
-        maxAge: 24 * 60 * 60 * 1000,
-      });
-
-      return res.status(200).json({
-        success: true,
-        message: 'User login successful',
-        user,
-      });
-
-    } else {
-      return res.status(401).json({
-        success: false,
-        message: 'Password is incorrect',
-      });
-    }
+    return res.status(200).json({
+      success: true,
+      message: 'User login successful',
+      user,
+    });
   } catch (error) {
     console.log('error in login ', error.message);
     return res.status(500).json({
