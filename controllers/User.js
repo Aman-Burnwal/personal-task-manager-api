@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import User from '../models/User.js';
 import { USER, VALIDATIONS } from '../utils/constant.js';
 
-export const register = async (req, res) => {
+export const signup = async (req, res) => {
   if (!req.body) {
     return res.status(400).json({
       success: false,
@@ -105,6 +105,12 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  if (!req.body) {
+    return res.status(400).json({
+      success: false,
+      message: 'Body data is missing',
+    });
+  }
   const { email, password } = req.body;
 
   // valid the user data is empty or not
@@ -114,10 +120,54 @@ export const login = async (req, res) => {
       message: 'User data is missing',
     });
   }
+
+  const isEveryUserDataString = [email, password].every(
+    (userData) => typeof userData === 'string'
+  );
+
+  if (!isEveryUserDataString) {
+    return res.status(400).json({
+      success: false,
+      message: 'User data is not correct type',
+    });
+  }
+
   if (!VALIDATIONS.EMAIL(email)) {
     return res.status(403).json({
       success: false,
       message: 'Please enter a valid email',
+    });
+  }
+
+  try {
+    const user = await User.findOne({
+      where: { [USER.EMAIL]: email },
+    });
+    if (!user) {
+      return res.status(200).json({
+        success: false,
+        message: 'You are not registered',
+      });
+    }
+
+    if (await bcrypt.compare(password, user.password)) {
+      return res.status(200).json({
+        success: true,
+        message: 'User login successful',
+        user,
+      });
+    } else {
+      return res.status(500).json({
+        success: true,
+        message: 'User password is wrong',
+      });
+    }
+  } catch (error) {
+    console.log('error in login ', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong in login',
+      error: error.message,
     });
   }
 };
