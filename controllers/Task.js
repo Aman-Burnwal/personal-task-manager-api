@@ -52,3 +52,32 @@ export const createTask = async (req, res) => {
     });
   }
 };
+
+export const getAllTasks = async (req, res) => {
+  const { id } = req.user;
+  if (!id) {
+    return res.status(401).json({
+      success: false,
+      message: "user Id is missing"
+    });
+  };
+
+  try {
+    const userTasks = await Task.findAll({
+      where: {
+        [TASK.USER_ID] : id
+      }
+    })
+    return res.status(200).json({
+      success: true,
+      message: 'User task fetched successful',
+      tasks: userTasks
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'error in getting user tasks',
+      error: error.message
+    })
+  }
+}
