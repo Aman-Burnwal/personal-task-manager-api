@@ -56,10 +56,10 @@ export const getAllTasks = async (req, res, next) => {
   }
 
   try {
-    const userTasks = await getUserTasksService(id);
+    const userTasks = await getUserTasksService(id, req.query);
     return res.status(200).json({
       success: true,
-      message: 'User task fetched successful',
+      message: 'User tasks fetched successfully',
       tasks: userTasks,
     });
   } catch (error) {

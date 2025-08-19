@@ -5,9 +5,38 @@ export const createTaskService = async (taskData) => {
   return await Task.create(taskData);
 };
 
-export const getUserTasksService = async (userId) => {
+export const getUserTasksService = async (userId, filters = {}) => {
+  const { priority, status, from, to, sortBy, order } = filters;
+
+  const whereClause = { [TASK.USER_ID]: userId };
+
+  if (priority) {
+    whereClause[TASK.PRIORITY] = priority;
+  }
+
+  if (status) {
+    whereClause[TASK.STATUS] = status;
+  }
+
+  if (from && to) {
+    whereClause[TASK.DUE_DATE] = { $between: [from, to] };
+  } else if (from) {
+    whereClause[TASK.DUE_DATE] = { $gte: from };
+  } else if (to) {
+    whereClause[TASK.DUE_DATE] = { $lte: to };
+  }
+
+  let orderClause = [];
+  if (sortBy) {
+    orderClause.push([
+      sortBy,
+      order && order.toLowerCase() === 'desc' ? 'DESC' : 'ASC',
+    ]);
+  }
+
   return await Task.findAll({
-    where: { [TASK.USER_ID]: userId },
+    where: whereClause,
+    order: orderClause,
   });
 };
 
