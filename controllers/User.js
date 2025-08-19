@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import User from '../models/User.js';
 import { USER, VALIDATIONS } from '../utils/constant.js';
@@ -151,15 +152,32 @@ export const login = async (req, res) => {
     }
 
     if (await bcrypt.compare(password, user.password)) {
+      const payload = {
+        id: user[USER.ID],
+      };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '24h',
+      });
+
+      user.password = undefined;
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
       return res.status(200).json({
         success: true,
         message: 'User login successful',
         user,
       });
+
     } else {
-      return res.status(500).json({
-        success: true,
-        message: 'User password is wrong',
+      return res.status(401).json({
+        success: false,
+        message: 'Password is incorrect',
       });
     }
   } catch (error) {
