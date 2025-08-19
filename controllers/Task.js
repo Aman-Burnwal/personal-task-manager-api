@@ -4,7 +4,7 @@ import {
   getSingleTaskService,
   getUserTasksService,
   updateTaskService,
-} from '../services/task.js';
+} from '../services/tasks.js';
 import { TASK } from '../utils/constant.js';
 
 export const createTask = async (req, res) => {
