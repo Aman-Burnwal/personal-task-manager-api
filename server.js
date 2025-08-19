@@ -2,8 +2,8 @@ import express, { json } from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/connectDB.js';
-import userRouter from './routers/User.js'
-import taskRouter from './routers/Task.js'
+import userRouter from './routers/Users.js'
+import taskRouter from './routers/Tasks.js'
 
 dotenv.config();
 const app = express();
