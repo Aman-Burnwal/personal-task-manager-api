@@ -10,11 +10,11 @@ export const createTask = async (req, res) => {
   }
   const { title, description, priority, dueDate, status } = req.body;
   const { id } = req.user;
-  // valid the user data is empty or not
+  // valid the Task data is empty or not
   if (!title || !description || !priority || !dueDate || !status || !id) {
     return res.status(400).json({
       success: false,
-      message: 'User data is missing',
+      message: 'Task data is missing',
     });
   }
 
@@ -25,7 +25,7 @@ export const createTask = async (req, res) => {
   if (!isEveryUserDataString || !dueDate instanceof Date) {
     return res.status(400).json({
       success: false,
-      message: 'User data is not correct type',
+      message: 'Task data is not correct type',
     });
   }
 
@@ -58,29 +58,29 @@ export const getAllTasks = async (req, res) => {
   if (!id) {
     return res.status(401).json({
       success: false,
-      message: "user Id is missing"
+      message: 'user Id is missing',
     });
-  };
+  }
 
   try {
     const userTasks = await Task.findAll({
       where: {
-        [TASK.USER_ID] : id
-      }
-    })
+        [TASK.USER_ID]: id,
+      },
+    });
     return res.status(200).json({
       success: true,
       message: 'User task fetched successful',
-      tasks: userTasks
-    })
+      tasks: userTasks,
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: 'error in getting user tasks',
-      error: error.message
-    })
+      error: error.message,
+    });
   }
-}
+};
 
 export const fetchSingleTask = async (req, res) => {
   const { id } = req.params;
@@ -89,16 +89,71 @@ export const fetchSingleTask = async (req, res) => {
     const task = await Task.findByPk(id);
     return res.status(200).json({
       success: true,
-      message: "Task found successful",
-      task
-    })
-    
+      message: 'Task found successful',
+      task,
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
-      error: error.message
-    })
+      error: error.message,
+    });
+  }
+};
+
+export const updateTask = async (req, res) => {
+  const { id } = req.params;
+  const { id: userId } = req.user;
+
+  if (!req.body) {
+    return res.status(400).json({
+      success: false,
+      message: 'Body data is missing',
+    });
+  }
+  const { title, description, priority, dueDate, status } = req.body;
+  // valid the user data is empty or not
+  if (!title || !description || !priority || !dueDate || !status || !id) {
+    return res.status(400).json({
+      success: false,
+      message: 'Task data is missing',
+    });
   }
 
-}
+  const isEveryUserDataString = [title, description, priority, status].every(
+    (userData) => typeof userData === 'string'
+  );
+
+  if (!isEveryUserDataString || !dueDate instanceof Date) {
+    return res.status(400).json({
+      success: false,
+      message: 'Task data is not correct type',
+    });
+  }
+
+  try {
+    const updatedTaskObj = {
+      [TASK.TITLE]: title,
+      [TASK.DESCRIPTION]: description,
+      [TASK.PRIORITY]: priority,
+      [TASK.DUE_DATE]: dueDate,
+      [TASK.STATUS]: status,
+      [TASK.USER_ID]: userId,
+    };
+    await Task.update(updatedTaskObj, {
+      where: {
+        [TASK.ID]: id,
+      },
+    });
+    return res.status(201).json({
+      success: true,
+      message: 'Task updated successfully',
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error in task update',
+      error: error.message,
+    });
+  }
+};
