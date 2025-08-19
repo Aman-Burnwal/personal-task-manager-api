@@ -6,22 +6,17 @@ import {
   updateTaskService,
 } from '../services/tasks.js';
 import { TASK } from '../utils/constant.js';
+import { errorHandler } from '../utils/errorHandler.js';
 
-export const createTask = async (req, res) => {
+export const createTask = async (req, res, next) => {
   if (!req.body) {
-    return res.status(400).json({
-      success: false,
-      message: 'Body data is missing',
-    });
+    return next(errorHandler(400, 'Body data is missing'));
   }
   const { title, description, priority, dueDate, status } = req.body;
   const { id } = req.user;
   // valid the Task data is empty or not
   if (!title || !description || !priority || !dueDate || !status || !id) {
-    return res.status(400).json({
-      success: false,
-      message: 'Task data is missing',
-    });
+    return next(errorHandler(400, 'Task data is missing'));
   }
 
   const isEveryUserDataString = [title, description, priority, status].every(
@@ -30,10 +25,7 @@ export const createTask = async (req, res) => {
   const parsedDueDate = new Date(dueDate);
 
   if (!isEveryUserDataString || isNaN(parsedDueDate.getTime())) {
-    return res.status(400).json({
-      success: false,
-      message: 'Task data is not correct type',
-    });
+    return next(errorHandler(400, 'Task data is not correct type'));
   }
 
   try {
@@ -53,21 +45,14 @@ export const createTask = async (req, res) => {
       task: newTask,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Error in task creation',
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-export const getAllTasks = async (req, res) => {
+export const getAllTasks = async (req, res, next) => {
   const { id } = req.user;
   if (!id) {
-    return res.status(401).json({
-      success: false,
-      message: 'user Id is missing',
-    });
+    return next(errorHandler(401, 'User Id is missing'));
   }
 
   try {
@@ -78,15 +63,11 @@ export const getAllTasks = async (req, res) => {
       tasks: userTasks,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'error in getting user tasks',
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-export const fetchSingleTask = async (req, res) => {
+export const fetchSingleTask = async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -97,31 +78,21 @@ export const fetchSingleTask = async (req, res) => {
       task,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-export const updateTask = async (req, res) => {
+export const updateTask = async (req, res, next) => {
   const { id } = req.params;
   const { id: userId } = req.user;
 
   if (!req.body) {
-    return res.status(400).json({
-      success: false,
-      message: 'Body data is missing',
-    });
+    return next(errorHandler(400, 'Body data is missing'));
   }
   const { title, description, priority, dueDate, status } = req.body;
   // valid the user data is empty or not
   if (!title || !description || !priority || !dueDate || !status || !id) {
-    return res.status(400).json({
-      success: false,
-      message: 'Task data is missing',
-    });
+    return next(errorHandler(400, 'Task data is missing'));
   }
 
   const isEveryUserDataString = [title, description, priority, status].every(
@@ -130,10 +101,7 @@ export const updateTask = async (req, res) => {
 
   const parsedDueDate = new Date(dueDate);
   if (!isEveryUserDataString || isNaN(parsedDueDate.getTime())) {
-    return res.status(400).json({
-      success: false,
-      message: 'Task data is not correct type',
-    });
+    return next(errorHandler(400, 'Task data is not correct type'));
   }
 
   try {
@@ -151,15 +119,11 @@ export const updateTask = async (req, res) => {
       message: 'Task updated successfully',
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Error in task update',
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-export const deleteTask = async (req, res) => {
+export const deleteTask = async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -169,10 +133,6 @@ export const deleteTask = async (req, res) => {
       message: 'Task deleted successful',
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server Error in task deletion',
-      error: error.message,
-    });
+    next(error);
   }
 };

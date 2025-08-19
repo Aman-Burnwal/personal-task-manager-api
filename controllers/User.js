@@ -1,4 +1,4 @@
-import { USER, VALIDATIONS } from '../utils/constant.js';
+import { VALIDATIONS } from '../utils/constant.js';
 import {
   findUserByEmailOrUsername,
   loginUser,
@@ -6,7 +6,7 @@ import {
 } from '../services/auth.js';
 import { errorHandler } from '../utils/errorHandler.js';
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
   if (!req.body) {
     return next(errorHandler(400, 'Body data is missing'));
   }
@@ -81,7 +81,7 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   if (!req.body) {
     return next(errorHandler(400, 'Body data is missing'));
   }
@@ -126,7 +126,6 @@ export const login = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.log('error in login ', error.message);
     next(error);
   }
 };
