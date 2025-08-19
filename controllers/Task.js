@@ -1,4 +1,10 @@
-import Task from '../models/Task.js';
+import {
+  createTaskService,
+  deleteTaskService,
+  getSingleTaskService,
+  getUserTasksService,
+  updateTaskService,
+} from '../services/task.js';
 import { TASK } from '../utils/constant.js';
 
 export const createTask = async (req, res) => {
@@ -21,8 +27,9 @@ export const createTask = async (req, res) => {
   const isEveryUserDataString = [title, description, priority, status].every(
     (userData) => typeof userData === 'string'
   );
+  const parsedDueDate = new Date(dueDate);
 
-  if (!isEveryUserDataString || !dueDate instanceof Date) {
+  if (!isEveryUserDataString || isNaN(parsedDueDate.getTime())) {
     return res.status(400).json({
       success: false,
       message: 'Task data is not correct type',
@@ -38,7 +45,8 @@ export const createTask = async (req, res) => {
       [TASK.STATUS]: status,
       [TASK.USER_ID]: id,
     };
-    const newTask = await Task.create(newTaskObj);
+    const newTask = await createTaskService(newTaskObj);
+
     return res.status(201).json({
       success: true,
       message: 'Task created successfully',
@@ -63,11 +71,7 @@ export const getAllTasks = async (req, res) => {
   }
 
   try {
-    const userTasks = await Task.findAll({
-      where: {
-        [TASK.USER_ID]: id,
-      },
-    });
+    const userTasks = await getUserTasksService(id);
     return res.status(200).json({
       success: true,
       message: 'User task fetched successful',
@@ -86,7 +90,7 @@ export const fetchSingleTask = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const task = await Task.findByPk(id);
+    const task = await getSingleTaskService(id);
     return res.status(200).json({
       success: true,
       message: 'Task found successful',
@@ -124,7 +128,8 @@ export const updateTask = async (req, res) => {
     (userData) => typeof userData === 'string'
   );
 
-  if (!isEveryUserDataString || !dueDate instanceof Date) {
+  const parsedDueDate = new Date(dueDate);
+  if (!isEveryUserDataString || isNaN(parsedDueDate.getTime())) {
     return res.status(400).json({
       success: false,
       message: 'Task data is not correct type',
@@ -140,11 +145,7 @@ export const updateTask = async (req, res) => {
       [TASK.STATUS]: status,
       [TASK.USER_ID]: userId,
     };
-    await Task.update(updatedTaskObj, {
-      where: {
-        [TASK.ID]: id,
-      },
-    });
+    await updateTaskService(id, updatedTaskObj);
     return res.status(201).json({
       success: true,
       message: 'Task updated successfully',
@@ -162,20 +163,16 @@ export const deleteTask = async (req, res) => {
   const { id } = req.params;
 
   try {
-    await Task.destroy({
-      where: {
-        [TASK.ID] : id
-      }
-    })
+    await deleteTaskService(id);
     return res.status(200).json({
       success: true,
-      message: 'Task deleted successful'
-    })
+      message: 'Task deleted successful',
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: 'Internal server Error in task deletion',
-      error: error.message
-    })
+      error: error.message,
+    });
   }
-}
+};
