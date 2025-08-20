@@ -13,9 +13,10 @@ export const TASK = {
   PRIORITY: 'priority',
   DUE_DATE: 'dueDate',
   USER_ID: 'userId',
-  STATUS: 'status'
-
-}
+  STATUS: 'status',
+  PRIORITY_ENUM: ['low', 'medium', 'high'],
+  STATUS_ENUM: ['pending', 'completed'],
+};
 
 export const VALIDATIONS = {
   EMAIL: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),

@@ -28,6 +28,13 @@ export const createTask = async (req, res, next) => {
     return next(errorResponse(400, 'Task data is not correct type'));
   }
 
+  if (!TASK.PRIORITY_ENUM.includes(priority)) {
+    return next(errorResponse(400, 'priority  is not valid type'));
+  }
+  if (!TASK.STATUS_ENUM.includes(status)) {
+    return next(errorResponse(400, 'status  is not valid type'));
+  }
+
   try {
     const newTaskObj = {
       [TASK.TITLE]: title,
@@ -102,6 +109,13 @@ export const updateTask = async (req, res, next) => {
   const parsedDueDate = new Date(dueDate);
   if (!isEveryUserDataString || isNaN(parsedDueDate.getTime())) {
     return next(errorResponse(400, 'Task data is not correct type'));
+  }
+
+  if (!TASK.PRIORITY_ENUM.includes(priority)) {
+    return next(errorResponse(400, 'priority  is not valid type'));
+  }
+  if (!TASK.STATUS_ENUM.includes(status)) {
+    return next(errorResponse(400, 'status  is not valid type'));
   }
 
   try {
