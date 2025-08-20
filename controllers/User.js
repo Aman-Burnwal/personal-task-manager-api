@@ -4,16 +4,16 @@ import {
   loginUser,
   registerUser,
 } from '../services/auth.js';
-import { errorHandler } from '../utils/errorHandler.js';
+import { errorResponse } from '../utils/errorHandler.js';
 
 export const signup = async (req, res, next) => {
   if (!req.body) {
-    return next(errorHandler(400, 'Body data is missing'));
+    return next(errorResponse(400, 'Body data is missing'));
   }
   const { username, email, password, confirmPassword } = req.body;
   // valid the user data is empty or not
   if (!username || !email || !password || !confirmPassword) {
-    return next(errorHandler(400, 'User data is missing'));
+    return next(errorResponse(400, 'User data is missing'));
   }
 
   const isEveryUserDataString = [
@@ -24,12 +24,12 @@ export const signup = async (req, res, next) => {
   ].every((userData) => typeof userData === 'string');
 
   if (!isEveryUserDataString) {
-    return next(errorHandler(400, 'User data is not correct type'));
+    return next(errorResponse(400, 'User data is not correct type'));
   }
 
   if (!VALIDATIONS.USER_NAME(username)) {
     return next(
-      errorHandler(
+      errorResponse(
         400,
         'Please enter a valid username. starts with letter/underscore, only letters/numbers/underscore, min 6 chars'
       )
@@ -39,18 +39,18 @@ export const signup = async (req, res, next) => {
   // verify that password and confirmPassword are same or not
   if (password != confirmPassword) {
     return next(
-      errorHandler(400, 'Password and Confirm Password are not matching')
+      errorResponse(400, 'Password and Confirm Password are not matching')
     );
   }
 
   // verify that email is valid or not
   if (!VALIDATIONS.EMAIL(email)) {
-    return next(errorHandler(400, 'Please enter a valid email'));
+    return next(errorResponse(400, 'Please enter a valid email'));
   }
 
   if (!VALIDATIONS.PASSWORD(password)) {
     return next(
-      errorHandler(
+      errorResponse(
         400,
         'Please enter a valid Password. minimum 8 chars, at least 1 uppercase, 1 lowercase, 1 number, 1 special char'
       )
@@ -61,7 +61,7 @@ export const signup = async (req, res, next) => {
 
   if (isUserAlreadyExist) {
     return next(
-      errorHandler(
+      errorResponse(
         400,
         isUserAlreadyExist.email === email
           ? 'This email is already registered'
@@ -83,13 +83,13 @@ export const signup = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   if (!req.body) {
-    return next(errorHandler(400, 'Body data is missing'));
+    return next(errorResponse(400, 'Body data is missing'));
   }
   const { email, password } = req.body;
 
   // valid the user data is empty or not
   if (!email || !password) {
-    return next(errorHandler(400, 'User data is missing'));
+    return next(errorResponse(400, 'User data is missing'));
   }
 
   const isEveryUserDataString = [email, password].every(
@@ -97,17 +97,17 @@ export const login = async (req, res, next) => {
   );
 
   if (!isEveryUserDataString) {
-    return next(errorHandler(400, 'User data is not correct type'));
+    return next(errorResponse(400, 'User data is not correct type'));
   }
 
   if (!VALIDATIONS.EMAIL(email)) {
-    return next(errorHandler(400, 'Please enter a valid email'));
+    return next(errorResponse(400, 'Please enter a valid email'));
   }
 
   try {
     const loginData = await loginUser(email, password);
     if (!loginData) {
-      return next(errorHandler(400, 'Invalid email or Password'));
+      return next(errorResponse(400, 'Invalid email or Password'));
     }
 
     const { user, token } = loginData;

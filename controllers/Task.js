@@ -6,17 +6,17 @@ import {
   updateTaskService,
 } from '../services/tasks.js';
 import { TASK } from '../utils/constant.js';
-import { errorHandler } from '../utils/errorHandler.js';
+import { errorResponse } from '../utils/errorHandler.js';
 
 export const createTask = async (req, res, next) => {
   if (!req.body) {
-    return next(errorHandler(400, 'Body data is missing'));
+    return next(errorResponse(400, 'Body data is missing'));
   }
   const { title, description, priority, dueDate, status } = req.body;
   const { id } = req.user;
   // valid the Task data is empty or not
   if (!title || !description || !priority || !dueDate || !status || !id) {
-    return next(errorHandler(400, 'Task data is missing'));
+    return next(errorResponse(400, 'Task data is missing'));
   }
 
   const isEveryUserDataString = [title, description, priority, status].every(
@@ -25,7 +25,7 @@ export const createTask = async (req, res, next) => {
   const parsedDueDate = new Date(dueDate);
 
   if (!isEveryUserDataString || isNaN(parsedDueDate.getTime())) {
-    return next(errorHandler(400, 'Task data is not correct type'));
+    return next(errorResponse(400, 'Task data is not correct type'));
   }
 
   try {
@@ -52,7 +52,7 @@ export const createTask = async (req, res, next) => {
 export const getAllTasks = async (req, res, next) => {
   const { id } = req.user;
   if (!id) {
-    return next(errorHandler(401, 'User Id is missing'));
+    return next(errorResponse(401, 'User Id is missing'));
   }
 
   try {
@@ -87,12 +87,12 @@ export const updateTask = async (req, res, next) => {
   const { id: userId } = req.user;
 
   if (!req.body) {
-    return next(errorHandler(400, 'Body data is missing'));
+    return next(errorResponse(400, 'Body data is missing'));
   }
   const { title, description, priority, dueDate, status } = req.body;
   // valid the user data is empty or not
   if (!title || !description || !priority || !dueDate || !status || !id) {
-    return next(errorHandler(400, 'Task data is missing'));
+    return next(errorResponse(400, 'Task data is missing'));
   }
 
   const isEveryUserDataString = [title, description, priority, status].every(
@@ -101,7 +101,7 @@ export const updateTask = async (req, res, next) => {
 
   const parsedDueDate = new Date(dueDate);
   if (!isEveryUserDataString || isNaN(parsedDueDate.getTime())) {
-    return next(errorHandler(400, 'Task data is not correct type'));
+    return next(errorResponse(400, 'Task data is not correct type'));
   }
 
   try {
