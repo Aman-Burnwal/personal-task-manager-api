@@ -5,9 +5,8 @@
   "main": "nodemon server.js",
   "type": "module",
   "scripts": {
-    "test": "node server.js",
-    "dev": "nodemon server.js",
-    "lint": "eslint ."
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [
     "express",
