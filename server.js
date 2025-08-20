@@ -12,7 +12,7 @@ const app = express();
 app.use(json());
 app.use(cookieParser());
 app.use('/api/v1/auth', userRouter);
-app.use('/api/v1/task', taskRouter);
+app.use('/api/v1/tasks', taskRouter);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
