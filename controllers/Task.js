@@ -1,3 +1,4 @@
+import NodeCache from 'node-cache';
 import {
   createTaskService,
   deleteTaskService,
@@ -7,6 +8,8 @@ import {
 } from '../services/tasks.js';
 import {TASK} from '../utils/constant.js';
 import {errorResponse} from '../utils/errorHandler.js';
+
+const myCache = new NodeCache();
 
 export const createTask = async (req, res, next) => {
   if (!req.body) {
@@ -78,7 +81,13 @@ export const fetchSingleTask = async (req, res, next) => {
   const {id} = req.params;
 
   try {
-    const task = await getSingleTaskService(id);
+    let task;
+    if (!myCache.has(id)) {
+      task = await getSingleTaskService(id);
+      myCache.set(id, task, 300);
+    } else {
+      task = myCache.get(id);
+    }
     return res.status(200).json({
       success: true,
       message: 'Task found successful',
@@ -128,6 +137,9 @@ export const updateTask = async (req, res, next) => {
       [TASK.USER_ID]: userId,
     };
     await updateTaskService(id, updatedTaskObj);
+    if (myCache.has(id)) {
+      myCache.del(id);
+    }
     return res.status(201).json({
       success: true,
       message: 'Task updated successfully',
