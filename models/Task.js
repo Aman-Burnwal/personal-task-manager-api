@@ -1,7 +1,7 @@
-import { DataTypes } from "sequelize";
-import sequelize from "./index.js";
-import {TASK, USER} from '../utils/constant.js'
-import User from "./User.js";
+import {DataTypes} from 'sequelize';
+import sequelize from './index.js';
+import {TASK, USER} from '../utils/constant.js';
+import User from './User.js';
 
 const Task = sequelize.define('Task', {
   [TASK.ID]: {

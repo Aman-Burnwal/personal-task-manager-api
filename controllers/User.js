@@ -1,16 +1,16 @@
-import { VALIDATIONS } from '../utils/constant.js';
+import {VALIDATIONS} from '../utils/constant.js';
 import {
   findUserByEmailOrUsername,
   loginUser,
   registerUser,
 } from '../services/auth.js';
-import { errorResponse } from '../utils/errorHandler.js';
+import {errorResponse} from '../utils/errorHandler.js';
 
 export const signup = async (req, res, next) => {
   if (!req.body) {
     return next(errorResponse(400, 'Body data is missing'));
   }
-  const { username, email, password, confirmPassword } = req.body;
+  const {username, email, password, confirmPassword} = req.body;
   // valid the user data is empty or not
   if (!username || !email || !password || !confirmPassword) {
     return next(errorResponse(400, 'User data is missing'));
@@ -29,17 +29,17 @@ export const signup = async (req, res, next) => {
 
   if (!VALIDATIONS.USER_NAME(username)) {
     return next(
-      errorResponse(
-        400,
-        'Please enter a valid username. starts with letter/underscore, only letters/numbers/underscore, min 6 chars'
-      )
+        errorResponse(
+            400,
+            'Please enter a valid username. starts with letter/underscore, only letters/numbers/underscore, min 6 chars',
+        ),
     );
   }
 
   // verify that password and confirmPassword are same or not
   if (password != confirmPassword) {
     return next(
-      errorResponse(400, 'Password and Confirm Password are not matching')
+        errorResponse(400, 'Password and Confirm Password are not matching'),
     );
   }
 
@@ -50,10 +50,10 @@ export const signup = async (req, res, next) => {
 
   if (!VALIDATIONS.PASSWORD(password)) {
     return next(
-      errorResponse(
-        400,
-        'Please enter a valid Password. minimum 8 chars, at least 1 uppercase, 1 lowercase, 1 number, 1 special char'
-      )
+        errorResponse(
+            400,
+            'Please enter a valid Password. minimum 8 chars, at least 1 uppercase, 1 lowercase, 1 number, 1 special char',
+        ),
     );
   }
 
@@ -61,12 +61,12 @@ export const signup = async (req, res, next) => {
 
   if (isUserAlreadyExist) {
     return next(
-      errorResponse(
-        400,
-        isUserAlreadyExist.email === email
-          ? 'This email is already registered'
-          : 'This username is already taken'
-      )
+        errorResponse(
+            400,
+        isUserAlreadyExist.email === email ?
+          'This email is already registered' :
+          'This username is already taken',
+        ),
     );
   }
 
@@ -85,7 +85,7 @@ export const login = async (req, res, next) => {
   if (!req.body) {
     return next(errorResponse(400, 'Body data is missing'));
   }
-  const { email, password } = req.body;
+  const {email, password} = req.body;
 
   // valid the user data is empty or not
   if (!email || !password) {
@@ -93,7 +93,7 @@ export const login = async (req, res, next) => {
   }
 
   const isEveryUserDataString = [email, password].every(
-    (userData) => typeof userData === 'string'
+      (userData) => typeof userData === 'string',
   );
 
   if (!isEveryUserDataString) {
@@ -110,7 +110,7 @@ export const login = async (req, res, next) => {
       return next(errorResponse(400, 'Invalid email or Password'));
     }
 
-    const { user, token } = loginData;
+    const {user, token} = loginData;
     user.password = undefined;
 
     res.cookie('token', token, {

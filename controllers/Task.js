@@ -5,22 +5,22 @@ import {
   getUserTasksService,
   updateTaskService,
 } from '../services/tasks.js';
-import { TASK } from '../utils/constant.js';
-import { errorResponse } from '../utils/errorHandler.js';
+import {TASK} from '../utils/constant.js';
+import {errorResponse} from '../utils/errorHandler.js';
 
 export const createTask = async (req, res, next) => {
   if (!req.body) {
     return next(errorResponse(400, 'Body data is missing'));
   }
-  const { title, description, priority, dueDate, status } = req.body;
-  const { id } = req.user;
+  const {title, description, priority, dueDate, status} = req.body;
+  const {id} = req.user;
   // valid the Task data is empty or not
   if (!title || !description || !priority || !dueDate || !status || !id) {
     return next(errorResponse(400, 'Task data is missing'));
   }
 
   const isEveryUserDataString = [title, description, priority, status].every(
-    (userData) => typeof userData === 'string'
+      (userData) => typeof userData === 'string',
   );
   const parsedDueDate = new Date(dueDate);
 
@@ -57,7 +57,7 @@ export const createTask = async (req, res, next) => {
 };
 
 export const getAllTasks = async (req, res, next) => {
-  const { id } = req.user;
+  const {id} = req.user;
   if (!id) {
     return next(errorResponse(401, 'User Id is missing'));
   }
@@ -75,7 +75,7 @@ export const getAllTasks = async (req, res, next) => {
 };
 
 export const fetchSingleTask = async (req, res, next) => {
-  const { id } = req.params;
+  const {id} = req.params;
 
   try {
     const task = await getSingleTaskService(id);
@@ -90,20 +90,20 @@ export const fetchSingleTask = async (req, res, next) => {
 };
 
 export const updateTask = async (req, res, next) => {
-  const { id } = req.params;
-  const { id: userId } = req.user;
+  const {id} = req.params;
+  const {id: userId} = req.user;
 
   if (!req.body) {
     return next(errorResponse(400, 'Body data is missing'));
   }
-  const { title, description, priority, dueDate, status } = req.body;
+  const {title, description, priority, dueDate, status} = req.body;
   // valid the user data is empty or not
   if (!title || !description || !priority || !dueDate || !status || !id) {
     return next(errorResponse(400, 'Task data is missing'));
   }
 
   const isEveryUserDataString = [title, description, priority, status].every(
-    (userData) => typeof userData === 'string'
+      (userData) => typeof userData === 'string',
   );
 
   const parsedDueDate = new Date(dueDate);
@@ -138,7 +138,7 @@ export const updateTask = async (req, res, next) => {
 };
 
 export const deleteTask = async (req, res, next) => {
-  const { id } = req.params;
+  const {id} = req.params;
 
   try {
     await deleteTaskService(id);
